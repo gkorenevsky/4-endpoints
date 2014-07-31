@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="properties_config.xml" />
+
+    <bean id="mySqlDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close" lazy-init="false">
+        <property name="driverClass" value="${mysql.driverClassName}"/>
+        <property name="jdbcUrl" value="${mysql.connection_URL}"/>
+        <property name="properties">
+            <props>
+                <prop key="tcp.nodelay">true</prop>
+            </props>
+        </property>
+        <property name="user" value="${mysql.connection_userId}"/>
+        <property name="password" value="${mysql.connection_password}"/>
+        <property name="preferredTestQuery" value="SELECT 1 FROM DUAL"/>
+    </bean>
+
+</beans>

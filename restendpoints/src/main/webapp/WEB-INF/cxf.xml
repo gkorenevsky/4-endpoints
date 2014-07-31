@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="classpath:META-INF/cxf/cxf.xml" />
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+
+    <!-- CXF -->
+    <bean id="cxf" class="org.apache.cxf.bus.spring.SpringBus"/>
+
+    <bean id="jackson" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+
+    <bean class="org.apache.cxf.jaxrs.JAXRSServerFactoryBean" init-method="create">
+        <property name="bus" ref="cxf"/>
+        <property name="address" value="/"/>
+
+        <property name="providers">
+            <list>
+                <ref bean="jackson" />
+            </list>
+        </property>
+
+        <property name="serviceBeans">
+            <list>
+                <ref bean="echoController"/>
+                <ref bean="userAuthenticationController" />
+                <ref bean="usersListController" />
+                <ref bean="resourceStatusController" />
+                <ref bean="fileListController" />
+            </list>
+        </property>
+    </bean>
+</beans>
