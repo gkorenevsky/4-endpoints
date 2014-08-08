@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by greg korenevsky on 7/30/14.
  */
-public class FileListResponse {
+public class FileListResponse extends PagedResponse {
 
     private Date timeStamp;
     private boolean success;
@@ -63,4 +63,5 @@ public class FileListResponse {
     public void setFileCount(int fileCount) {
         this.fileCount = fileCount;
     }
+
 }

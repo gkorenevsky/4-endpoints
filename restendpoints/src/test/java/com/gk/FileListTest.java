@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 public class FileListTest {
 
     private static String ENDPOINT_URL_PREFIX;
-    private static final String ENDPOINT_URL_SUFFIX = "/rest/v1/fileList";
+    private static final String ENDPOINT_URL_SUFFIX = "/rest/v1/files";
 
     @BeforeClass
     public static void beforeClass() {
@@ -115,6 +115,107 @@ public class FileListTest {
         assertNull(fileListResponse.getDirectoryContents());
         assertTrue(fileListResponse.getDiagnosticMessage().startsWith("Not a directory"));
     }
+
+    @Test
+    public void testFileListDirectoryExistsWithPagingPage1() throws IOException {
+
+        List<Object> providers = new ArrayList<Object>() {
+            {
+                add(new JacksonJsonProvider());
+            }
+        };
+
+        WebClient client = WebClient.create(ENDPOINT_URL_PREFIX + ENDPOINT_URL_SUFFIX
+                , providers);
+        Response restResponse = client.accept("application/json")
+                .query("directoryPath", "/etc")
+                .query("page", "1")
+                .query("pageSize", "10")
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), restResponse.getStatus());
+        MappingJsonFactory factory = new MappingJsonFactory();
+        JsonParser parser = factory.createJsonParser((InputStream) restResponse.getEntity());
+        FileListResponse fileListResponse = parser.readValueAs(FileListResponse.class);
+
+        assertTrue(fileListResponse.isSuccess());
+        assertTrue(fileListResponse.getFileCount() > 0);
+        assertNotNull(fileListResponse.getDirectory());
+        assertNotNull(fileListResponse.getDirectoryContents());
+        assertEquals(fileListResponse.getDirectory().getAbsolutePath(), "/etc");
+        assertEquals(fileListResponse.getDirectory().getType(), FileInfo.Type.DIRECTORY.toString());
+        assertEquals(fileListResponse.getPageNumber(), 1);
+        assertEquals(fileListResponse.getPageSize(), 10);
+        assertEquals(fileListResponse.getFileCount(), fileListResponse.getDirectoryContents().size());
+        assertTrue(fileListResponse.getFileCount() <= fileListResponse.getPageSize());
+
+        System.out.println("Requested directory:");
+        displayFileInfo(fileListResponse.getDirectory());
+        System.out.println("Directory contents:");
+        for (FileInfo fileInfo : fileListResponse.getDirectoryContents()) {
+            displayFileInfo(fileInfo);
+        }
+    }
+
+    @Test
+    public void testFileListDirectoryExistsWithPagingAllPages() throws IOException {
+
+        List<Object> providers = new ArrayList<Object>() {
+            {
+                add(new JacksonJsonProvider());
+            }
+        };
+
+        boolean morePages = true;
+        int pageCount = 0;
+
+        WebClient client = WebClient.create(ENDPOINT_URL_PREFIX + ENDPOINT_URL_SUFFIX
+                , providers);
+
+        do {
+            pageCount++;
+
+            Response restResponse = client.accept("application/json")
+                    .query("directoryPath", "/etc")
+                    .query("page", Integer.toString(pageCount))
+                    .query("pageSize", "20")
+                    .get();
+
+            assertEquals(Response.Status.OK.getStatusCode(), restResponse.getStatus());
+
+            client.reset();
+            client.resetQuery();
+
+            MappingJsonFactory factory = new MappingJsonFactory();
+            JsonParser parser = factory.createJsonParser((InputStream) restResponse.getEntity());
+            FileListResponse fileListResponse = parser.readValueAs(FileListResponse.class);
+
+            assertTrue(fileListResponse.isSuccess());
+//            assertTrue(fileListResponse.getFileCount() > 0);
+            assertNotNull(fileListResponse.getDirectory());
+            assertNotNull(fileListResponse.getDirectoryContents());
+            assertEquals(fileListResponse.getDirectory().getAbsolutePath(), "/etc");
+            assertEquals(fileListResponse.getDirectory().getType(), FileInfo.Type.DIRECTORY.toString());
+            assertEquals(fileListResponse.getPageNumber(), pageCount);
+            assertEquals(fileListResponse.getPageSize(), 20);
+            assertEquals(fileListResponse.getFileCount(), fileListResponse.getDirectoryContents().size());
+            assertTrue(fileListResponse.getFileCount() <= fileListResponse.getPageSize());
+
+            System.out.println("Requested directory:");
+            displayFileInfo(fileListResponse.getDirectory());
+            System.out.println("Directory contents: page number="
+                    + pageCount
+                    + ", pageSize="
+                    + fileListResponse.getPageSize()
+                    + " :");
+            for (FileInfo fileInfo : fileListResponse.getDirectoryContents()) {
+                displayFileInfo(fileInfo);
+            }
+
+            morePages = (fileListResponse.getFileCount() == fileListResponse.getPageSize());
+        } while (morePages);
+    }
+
 
     private void displayFileInfo(FileInfo fileInfo) {
 

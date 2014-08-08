@@ -7,7 +7,7 @@ import java.util.Date;
  */
 public class AuthenticationResponse {
 
-    private Date timesStamp;
+    private Date timeStamp;
     private boolean userAuthenticated;
     private String reason;
 
@@ -16,21 +16,21 @@ public class AuthenticationResponse {
 
     public AuthenticationResponse(boolean userAuthenticated) {
         this.userAuthenticated = userAuthenticated;
-        this.timesStamp = new Date();
+        this.timeStamp = new Date();
     }
 
     public AuthenticationResponse(boolean userAuthenticated, String reason) {
         this.userAuthenticated = userAuthenticated;
         this.reason = reason;
-        this.timesStamp = new Date();
+        this.timeStamp = new Date();
     }
 
-    public Date getTimesStamp() {
-        return timesStamp;
+    public Date getTimeStamp() {
+        return timeStamp;
     }
 
-    public void setTimesStamp(Date timesStamp) {
-        this.timesStamp = timesStamp;
+    public void setTimeStamp(Date timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
     public boolean isUserAuthenticated() {
@@ -49,8 +49,8 @@ public class AuthenticationResponse {
         this.reason = reason;
     }
 
-    public AuthenticationResponse withTimesStamp(Date timesStamp) {
-        this.timesStamp = timesStamp;
+    public AuthenticationResponse withTimeStamp(Date timesStamp) {
+        this.timeStamp = timesStamp;
         return this;
     }
 

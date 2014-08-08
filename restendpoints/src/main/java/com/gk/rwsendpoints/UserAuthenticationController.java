@@ -3,6 +3,7 @@ package com.gk.rwsendpoints;
 import com.gk.rwsendpoints.dto.AuthenticationRequest;
 import com.gk.rwsendpoints.dto.AuthenticationResponse;
 import com.gk.rwsendpoints.services.api.UserAuthenticationServiceAPI;
+import com.wordnik.swagger.annotations.*;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.inject.Inject;
@@ -13,13 +14,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Created by greg korenevsky on 7/26/14.
  */
 @Named
-@Path("/rest/v1/authenticate")
+@Path("/rest/v1/authentication")
+@Api(value = "/authentication", description = "User authentication")
 public class UserAuthenticationController {
 
     private UserAuthenticationServiceAPI userAuthenticationService;
@@ -36,8 +38,11 @@ public class UserAuthenticationController {
     @POST
     @Produces("application/json")
     @Consumes("application/json")
-/*    @Path("/authenticate")*/
-    public Response authenticateUser(AuthenticationRequest input) {
+    @ApiOperation(value = "Authenticate user by Id and Password", response = AuthenticationResponse.class)
+    @ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid input") })
+    public Response authenticateUser(
+            @ApiParam(value = "Authentication request - contains user's id and password", required = true)
+            AuthenticationRequest input) {
 
         if (input == null || isBlank(input.getUserId()) || isBlank(input.getPassword())) {
             return Response.status(Response.Status.BAD_REQUEST).build();

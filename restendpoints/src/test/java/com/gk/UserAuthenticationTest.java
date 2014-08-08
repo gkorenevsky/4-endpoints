@@ -24,7 +24,7 @@ import org.junit.Test;
 public class UserAuthenticationTest {
 
     private static String ENDPOINT_URL_PREFIX;
-    private static final String ENDPOINT_URL_SUFFIX = "/rest/v1/authenticate";
+    private static final String ENDPOINT_URL_SUFFIX = "/rest/v1/authentication";
 
     @BeforeClass
     public static void beforeClass() {

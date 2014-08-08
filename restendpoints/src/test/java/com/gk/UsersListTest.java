@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by greg korenevsky on 8/1/14.
@@ -24,7 +25,7 @@ import static org.junit.Assert.*;
 public class UsersListTest {
 
     private static String ENDPOINT_URL_PREFIX;
-    private static final String ENDPOINT_URL_SUFFIX = "/rest/v1/getUsers";
+    private static final String ENDPOINT_URL_SUFFIX = "/rest/v1/users";
 
     @BeforeClass
     public static void beforeClass() {
@@ -106,7 +107,9 @@ public class UsersListTest {
             }
         };
 
+
         WebClient client = WebClient.create(ENDPOINT_URL_PREFIX + ENDPOINT_URL_SUFFIX, providers);
+
         Response restResponse = client.accept("application/json")
                 .query("attributeName", "gender")
                 .query("attributeValue", "F")
@@ -131,4 +134,56 @@ public class UsersListTest {
             ;
         }
     }
+
+    @Test
+    public void testRetrieveAllUsersWithPaging() throws IOException {
+
+        List<Object> providers = new ArrayList<Object>() {
+            {
+                add(new JacksonJsonProvider());
+            }
+        };
+
+        boolean morePages = true;
+        int pageCount = 0;
+
+        WebClient client = WebClient.create(ENDPOINT_URL_PREFIX + ENDPOINT_URL_SUFFIX, providers);
+
+        do {
+            pageCount++;
+
+            Response restResponse = client.accept("application/json")
+                    .query("page", Integer.toString(pageCount))
+                    .query("pageSize", "2")
+                    .get();
+
+            assertEquals(Response.Status.OK.getStatusCode(), restResponse.getStatus());
+
+            client.reset();
+            client.resetQuery();
+
+            MappingJsonFactory factory = new MappingJsonFactory();
+            JsonParser parser = factory.createJsonParser((InputStream) restResponse.getEntity());
+            UsersListResponse usersListResponse = parser.readValueAs(UsersListResponse.class);
+            assertTrue(usersListResponse.getUserCount() > 0);
+            assertNotNull(usersListResponse.getUsersList());
+            assertEquals(usersListResponse.getUserCount(), usersListResponse.getUsersList().size());
+            assertEquals(usersListResponse.getPageNumber(), pageCount);
+            assertEquals(usersListResponse.getPageSize(), 2);
+            assertTrue((usersListResponse.getUserCount() <= usersListResponse.getPageSize()));
+
+            System.out.println("Page number=" + usersListResponse.getPageNumber()
+                    + ", page size=" + usersListResponse.getPageSize());
+
+            for (UserInfo userInfo : usersListResponse.getUsersList()) {
+                System.out.println("User name="
+                        + userInfo.getFirstName()
+                        + ' '
+                        + userInfo.getLastName());
+            }
+
+            morePages = (usersListResponse.getUserCount() == usersListResponse.getPageSize());
+        } while (morePages);
+    }
+
 }

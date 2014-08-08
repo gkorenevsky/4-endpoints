@@ -6,9 +6,9 @@ import java.util.List;
 /**
  * Created by greg korenevsky on 7/29/14.
  */
-public class UsersListResponse {
+public class UsersListResponse extends PagedResponse {
 
-    private Date timesStamp;
+    private Date timeStamp;
     private int userCount;
     private List<UserInfo> usersList;
 
@@ -28,16 +28,16 @@ public class UsersListResponse {
         this.userCount = userCount;
     }
 
-    public Date getTimesStamp() {
-        return timesStamp;
+    public Date getTimeStamp() {
+        return timeStamp;
     }
 
-    public void setTimesStamp(Date timesStamp) {
-        this.timesStamp = timesStamp;
+    public void setTimeStamp(Date timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
-    public UsersListResponse withTimesStamp(Date timesStamp) {
-        this.timesStamp = timesStamp;
+    public UsersListResponse withTimeStamp(Date timesStamp) {
+        this.timeStamp = timesStamp;
         return this;
     }
 

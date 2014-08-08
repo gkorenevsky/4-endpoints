@@ -9,6 +9,7 @@
             <list>
                 <value>/WEB-INF/properties/hibernate.properties</value>
                 <value>/WEB-INF/properties/mysql.properties</value>
+                <value>/WEB-INF/properties/rwsendpoint.properties</value>
             </list>
         </property>
     </bean>
